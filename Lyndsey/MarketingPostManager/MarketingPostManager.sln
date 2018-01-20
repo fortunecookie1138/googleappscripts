@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketingPostManager.Web", "MarketingPostManager.Web\MarketingPostManager.Web.csproj", "{4B07B001-4E04-4E27-82CC-466EA4E0381D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketingPostManager.Web.Test.Unit", "MarketingPostManager.Web.Test.Unit\MarketingPostManager.Web.Test.Unit.csproj", "{A1D31D32-408F-4303-A9F2-B80FCEC4E0A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketingPostManager.Web.Test.Integration", "MarketingPostManager.Web.Test.Integration\MarketingPostManager.Web.Test.Integration.csproj", "{3919B744-1A3E-4E29-9B65-C6A07430B805}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5873B4DE-4EEB-48FF-A677-DD4EE1DA9E41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketingPostManager", "MarketingPostManager\MarketingPostManager.csproj", "{41729554-FC03-4746-86C5-482A1333B885}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B07B001-4E04-4E27-82CC-466EA4E0381D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B07B001-4E04-4E27-82CC-466EA4E0381D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B07B001-4E04-4E27-82CC-466EA4E0381D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B07B001-4E04-4E27-82CC-466EA4E0381D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1D31D32-408F-4303-A9F2-B80FCEC4E0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1D31D32-408F-4303-A9F2-B80FCEC4E0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1D31D32-408F-4303-A9F2-B80FCEC4E0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1D31D32-408F-4303-A9F2-B80FCEC4E0A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3919B744-1A3E-4E29-9B65-C6A07430B805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3919B744-1A3E-4E29-9B65-C6A07430B805}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3919B744-1A3E-4E29-9B65-C6A07430B805}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3919B744-1A3E-4E29-9B65-C6A07430B805}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41729554-FC03-4746-86C5-482A1333B885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41729554-FC03-4746-86C5-482A1333B885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41729554-FC03-4746-86C5-482A1333B885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41729554-FC03-4746-86C5-482A1333B885}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A1D31D32-408F-4303-A9F2-B80FCEC4E0A0} = {5873B4DE-4EEB-48FF-A677-DD4EE1DA9E41}
+		{3919B744-1A3E-4E29-9B65-C6A07430B805} = {5873B4DE-4EEB-48FF-A677-DD4EE1DA9E41}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://josephmfortunato.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = MarketingPostManager.Web\\MarketingPostManager.Web.csproj
+		SccProjectName1 = MarketingPostManager.Web
+		SccLocalPath1 = MarketingPostManager.Web
+		SccProjectUniqueName2 = MarketingPostManager.Web.Test.Integration\\MarketingPostManager.Web.Test.Integration.csproj
+		SccProjectTopLevelParentUniqueName2 = MarketingPostManager.sln
+		SccProjectName2 = MarketingPostManager.Web.Test.Integration
+		SccLocalPath2 = MarketingPostManager.Web.Test.Integration
+		SccProjectUniqueName3 = MarketingPostManager.Web.Test.Unit\\MarketingPostManager.Web.Test.Unit.csproj
+		SccProjectTopLevelParentUniqueName3 = MarketingPostManager.sln
+		SccProjectName3 = MarketingPostManager.Web.Test.Unit
+		SccLocalPath3 = MarketingPostManager.Web.Test.Unit
+		SccProjectUniqueName4 = MarketingPostManager\\MarketingPostManager.csproj
+		SccProjectName4 = MarketingPostManager
+		SccLocalPath4 = MarketingPostManager
+	EndGlobalSection
+EndGlobal

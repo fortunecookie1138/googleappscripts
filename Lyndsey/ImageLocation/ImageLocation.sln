@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLocation", "ImageLocation\ImageLocation.csproj", "{7452E778-F981-4CBE-B191-7332C72CBB21}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Ad-Hoc|iPhone = Ad-Hoc|iPhone
+		Ad-Hoc|iPhoneSimulator = Ad-Hoc|iPhoneSimulator
+		AppStore|iPhone = AppStore|iPhone
+		AppStore|iPhoneSimulator = AppStore|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Ad-Hoc|iPhone.ActiveCfg = Ad-Hoc|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Ad-Hoc|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Ad-Hoc|iPhoneSimulator.Build.0 = Ad-Hoc|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.AppStore|iPhone.Build.0 = AppStore|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.AppStore|iPhoneSimulator.ActiveCfg = AppStore|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.AppStore|iPhoneSimulator.Build.0 = AppStore|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Debug|iPhone.Build.0 = Debug|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Release|iPhone.ActiveCfg = Release|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Release|iPhone.Build.0 = Release|iPhone
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{7452E778-F981-4CBE-B191-7332C72CBB21}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD0C350B-C1E6-4203-8C66-5DED4E46ACE4}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://josephmfortunato.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ImageLocation\\ImageLocation.csproj
+		SccProjectName1 = ImageLocation
+		SccLocalPath1 = ImageLocation
+	EndGlobalSection
+EndGlobal
