@@ -1,0 +1,7 @@
+Notes for planning ATS WordPress plugin:
+
+- Use custom post type?
+ use javascript / php to validate fields on post save
+- Somehow loop through fields in custom post and save them all together as an array of KVPs
+- Loop through fields of custom post type to display table headers for view page
+- use javascript to filter view page
