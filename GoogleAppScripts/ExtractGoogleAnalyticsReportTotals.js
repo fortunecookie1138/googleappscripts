@@ -37,20 +37,20 @@ function DeleteExportTrigger() {
 function ExtractReportValues() {
   var sourceSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var destinationSpreadsheet = SpreadsheetApp.openById(destinationSpreadsheetId);
-  Logger.log("Source spreadsheet: " + sourceSpreadsheet.getName());
-  Logger.log("Destination spreadsheet: " + destinationSpreadsheet.getName());
-  Logger.log("Total source sheets: " + sourceSpreadsheet.getSheets().length);
+  Logger.log("Source spreadsheet: %s", sourceSpreadsheet.getName());
+  Logger.log("Destination spreadsheet: %s", destinationSpreadsheet.getName());
   
   var weekStartDate = GetWeekStartDate(sourceSpreadsheet);
-  Logger.log("Week start date: " + weekStartDate);
+  Logger.log("Week start date: %s", weekStartDate);
   
   var rowIndexToWrite = destinationSpreadsheet.getSheets()[0].getLastRow()+1;
-  Logger.log("Row Index to write: " + rowIndexToWrite);
+  Logger.log("Row Index to write: %s", rowIndexToWrite);
   
   WriteWeekStartDate(destinationSpreadsheet, rowIndexToWrite, weekStartDate);
   
   var reportValues = GetReportValues(sourceSpreadsheet);
-  WriteReportValues(destinationSpreadsheet, rowIndexToWrite, reportValues);
+  var headerColumnIndexes = GetHeaderColumnIndexes(destinationSpreadsheet);
+  WriteReportValues(destinationSpreadsheet, headerColumnIndexes, rowIndexToWrite, reportValues);
 }
 
 function GetWeekStartDate(sourceSpreadsheet) {
@@ -70,31 +70,38 @@ function GetReportValues(sourceSpreadsheet) {
   for (var i = 1; i < sheets.length; i++)
   {
     var sheetName = sheets[i].getName();
-    var sheetReportValue = sheets[i].getRange("A12").getValue();
+    var sheetReportValue = sheets[i].getRange("A12").getValue(); // the magic cell where the total always is
     reportValues[sheetName] = sheetReportValue;
   }
   return reportValues;
 }
 
-function WriteReportValues(destinationSpreadsheet, rowIndexToWrite, reportValues) {
+function GetHeaderColumnIndexes(destinationSpreadsheet) {
   var summarySheet = destinationSpreadsheet.getSheets()[0];
   var headerColumnIndexes = {};
-  // start 2 to skip the date column
-  for (var i = 2; i <= summarySheet.getLastColumn(); i++)
+  // start 5 to skip the date and week total columns
+  for (var i = 5; i <= summarySheet.getLastColumn(); i++)
   {
     var headerName = summarySheet.getRange(1, i).getValue();
     headerColumnIndexes[headerName] = i;
-    Logger.log("Header: " + headerName + ", header column index: " + i);
+    Logger.log("Header: %s, header column index: %s", headerName, i);
   }
+  return headerColumnIndexes;
+}
+
+function WriteReportValues(destinationSpreadsheet, headerColumnIndexes, rowIndexToWrite, reportValues) {
+  var summarySheet = destinationSpreadsheet.getSheets()[0];
+  var currentWeekTotal = 0;
+  var weekLastYearTotal = 0;
   
   for (key in reportValues)
   {
     var reportValue = reportValues[key];
-    Logger.log("Report Name: " + key + ", report value: " + reportValue);
+    Logger.log("Report Name: %s, report value: %s", key, reportValue);
     var columnIndex = headerColumnIndexes[key];
     if (columnIndex)
     {
-      Logger.log("Writing value " + reportValue + " to row: " + rowIndexToWrite + " column: + " + columnIndex);
+      Logger.log("Writing value %s to row: %s column: %s", reportValue, rowIndexToWrite, columnIndex);
       summarySheet.getRange(rowIndexToWrite, columnIndex).setValue(reportValue);
     }
     else
@@ -107,5 +114,40 @@ function WriteReportValues(destinationSpreadsheet, rowIndexToWrite, reportValues
         throw errorMessage;
       }
     }
+    
+    if (key.match(/last year/i))
+    {
+      weekLastYearTotal += reportValue;
+    }
+    else
+    {
+      currentWeekTotal += reportValue;
+    }
   }
+  
+  var percentageChange = DeterminePercentageChange(currentWeekTotal, weekLastYearTotal);
+  var totalsRange = summarySheet.getRange(rowIndexToWrite, 2, 1, 3);
+  totalsRange.setValues([[ currentWeekTotal, weekLastYearTotal, percentageChange ]]);
+}
+
+function DeterminePercentageChange(currentTotal, lastYearTotal) {
+  Logger.log("Current week total: %s, week last year total: %s", currentTotal, lastYearTotal);
+  
+  var sign = "";
+  var percentChange = 0;
+  if (currentTotal > lastYearTotal)
+  {
+    sign = "+";
+    percentChange = (currentTotal - lastYearTotal) / currentTotal * 100;
+  }
+  else if (currentTotal < lastYearTotal)
+  {
+    sign = "-";
+    percentChange = (lastYearTotal - currentTotal) / lastYearTotal * 100;
+  }
+  
+  var returnValue = sign + percentChange;
+  Logger.log("Percentage change: %s", returnValue);
+  
+  return returnValue;
 }
