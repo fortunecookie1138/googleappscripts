@@ -12,8 +12,8 @@ function onOpen() {
 
 function CreateExportTrigger() {
   var ui = SpreadsheetApp.getUi();
-  var hourToRun = ui.prompt("What hour should export run at?").getResponseText();
-  var minuteToRun = ui.prompt("What minute (0, 15, 30, 45) should export run at?").getResponseText();
+  var hourToRun = ui.prompt("What hour should export run on Mondays?").getResponseText();
+  var minuteToRun = ui.prompt("What minute (0, 15, 30, 45) should export run?").getResponseText();
   ScriptApp.newTrigger('ExtractReportValues')
       .timeBased()
       .onWeekDay(ScriptApp.WeekDay.MONDAY)
