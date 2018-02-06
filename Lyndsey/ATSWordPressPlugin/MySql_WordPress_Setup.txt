@@ -1,9 +1,0 @@
-Create new IIS website using C:\Live\WebSites\, then convert the \wordpress\ subfolder to an application
-
-Open MySQL Shell:
-mysql -u root -p
-Wbsytuzi64...!
-DROP USER 'wordpress'@'localhost';
-CREATE USER 'wordpress'@'localhost' IDENTIFIED BY 'Mkolp1234.';
-CREATE SCHEMA wordpress;
-GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost' IDENTIFIED BY 'Mkolp1234.';
