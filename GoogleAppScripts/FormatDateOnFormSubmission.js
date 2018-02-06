@@ -7,12 +7,21 @@ function onOpen() {
 }
 
 function CreateTrigger() {
-  ScriptApp.newTrigger('FormatTimestampOnSubmission')
+  var existingTriggers = ScriptApp.getProjectTriggers();
+  var ui = SpreadsheetApp.getUi();
+  if (existingTriggers.length == 0)
+  {
+    ScriptApp.newTrigger('FormatTimestampOnSubmission')
       .forSpreadsheet(SpreadsheetApp.getActive())
       .onFormSubmit()
       .create();
   
-  SpreadsheetApp.getUi().alert("Auto format date field trigger created");
+  ui.alert("Auto format date field trigger created");
+  }
+  else
+  {
+    ui.alert("Did not create auto format date field trigger because it already exists");
+  }
 }
 
 function DeleteTrigger() {
