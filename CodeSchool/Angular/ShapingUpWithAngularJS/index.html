@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!--
+Deploy to C:\inetpub\wwwroot\ShapingUpWithAngularJS for the ng-include stuff to work
+http://campus.codeschool.com/courses/shaping-up-with-angularjs/level/1/section/1/video/1
+-->
+<html ng-app="store">
+	<script type="text/javascript" src="angular.min.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+	<script type="text/javascript" src="products.js"></script>
+	<head>
+		<link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="index.css"/>
+	</head>
+	<body ng-controller="StoreController as store">
+		<ul class="list-group">
+			<li class="list-group-item" ng-repeat="product in store.products">
+				<product-title></product-title>
+				<!--^^^ bc some browsers don't like self-closing tags for custom elements-->
+				<img ng-src="{{product.images[0].full}}"/>
+				<product-panels></product-panels>
+			</li>
+		</ul>
+	</body>
+</html>
+
