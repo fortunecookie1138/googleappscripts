@@ -1,0 +1,4 @@
+# ignore the generated scrape results
+*.xlsx
+
+web-scraper-env/
