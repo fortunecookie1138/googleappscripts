@@ -1,0 +1,4 @@
+# ignore the generated results and python env stuff
+*.csv
+
+my-env/
