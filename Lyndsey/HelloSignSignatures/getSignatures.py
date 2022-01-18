@@ -13,19 +13,11 @@ def getApiData(page = 1):
   loaded = json.loads(response.text)
   return loaded
 
-firstPage = getApiData()
-
-signatureCount = firstPage["list_info"]["num_results"]
-print('Signature count: ' + str(signatureCount))
-
-pageCount = firstPage["list_info"]["num_pages"]
-print('Page count: ' + str(pageCount))
-
 emails = []
 isComplete = []
 currentPage = 1
 while currentPage < 5: # for testing with only a few API calls
-# while currentPage < pageCount:
+# while currentPage <= pageCount:
   print('Current page: ' + str(currentPage))
   pageData = getApiData(currentPage)
   signatures = pageData["signature_requests"]
@@ -51,3 +43,12 @@ timestamp = time.strftime("%Y%m%d-%H%M%S")
 f = open('C:\src\personalthings\Lyndsey\HelloSignSignatures\\FedexLetterOfConcern_'+timestamp+'.csv', "w")
 f.writelines(lines)
 f.close()
+
+firstPage = getApiData()
+
+print('\n')
+signatureCount = firstPage["list_info"]["num_results"]
+print('Signature count: ' + str(signatureCount))
+
+pageCount = firstPage["list_info"]["num_pages"]
+print('Page count: ' + str(pageCount))
