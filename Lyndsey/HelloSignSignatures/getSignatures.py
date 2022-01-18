@@ -2,7 +2,6 @@
 
 import requests
 import json
-import csv
 import time
 
 apiKey = '18ab7fe66f4a5fcd7a8f06896dbb8c672d781548e44bab1770b182c9924bce59'
@@ -25,8 +24,8 @@ print('Page count: ' + str(pageCount))
 emails = []
 isComplete = []
 currentPage = 1
-# while currentPage < 5: # for testing with only a few API calls
-while currentPage < pageCount:
+while currentPage < 5: # for testing with only a few API calls
+# while currentPage < pageCount:
   print('Current page: ' + str(currentPage))
   pageData = getApiData(currentPage)
   signatures = pageData["signature_requests"]
