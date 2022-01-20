@@ -13,8 +13,13 @@ def getApiData(page = 1):
   loaded = json.loads(response.text)
   return loaded
 
+firstPage = getApiData()
+signatureCount = firstPage["list_info"]["num_results"]
+pageCount = firstPage["list_info"]["num_pages"]
+
 emails = []
 isComplete = []
+terminals = []
 currentPage = 1
 while currentPage < 5: # for testing with only a few API calls
 # while currentPage <= pageCount:
@@ -24,18 +29,21 @@ while currentPage < 5: # for testing with only a few API calls
   for sig in signatures:
     email = sig["signatures"][0]["signer_email_address"]
     status = sig["is_complete"]
-    print(email + ' is ' + str(status))
+     # Terminal # is stored in "Textbox2", which is 4th in the response data array
+    terminal = sig["response_data"][3]["value"] if bool(status) else ""
+    print(email + ' is ' + str(status) + ', in terminal ' + str(terminal))
     emails.append(email)
     isComplete.append(status)
+    terminals.append(terminal)
 
   currentPage += 1
 
 # print(emails)
 
-lines = ['Email,IsComplete\n']
+lines = ['Email,IsComplete,Terminal\n']
 i = 0
 while i < len(emails):
-  lines.append(emails[i] + ',' + str(isComplete[i]) + '\n')
+  lines.append(emails[i] + ',' + str(isComplete[i]) + ',' + str(terminals[i]) + '\n')
   i += 1
 
 timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -44,11 +52,6 @@ f = open('C:\src\personalthings\Lyndsey\HelloSignSignatures\\FedexLetterOfConcer
 f.writelines(lines)
 f.close()
 
-firstPage = getApiData()
-
 print('\n')
-signatureCount = firstPage["list_info"]["num_results"]
 print('Signature count: ' + str(signatureCount))
-
-pageCount = firstPage["list_info"]["num_pages"]
 print('Page count: ' + str(pageCount))
