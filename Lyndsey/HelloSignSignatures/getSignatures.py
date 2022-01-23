@@ -77,10 +77,10 @@ f = open('C:\src\personalthings\Lyndsey\HelloSignSignatures\\FedexLetterOfConcer
 f.writelines(lines)
 f.close()
 
-emails = [s.signatureEmail for s in signers]
-uniqueEmails = set(emails)
+signedEmails = [s.signatureEmail for s in filter(lambda x: x.isComplete == True, signers)]
+uniqueEmails = set(signedEmails)
 
 print('\n')
 print(f'Total page count: {str(pageCount)}')
 print(f'Total signature count: {str(signatureCount)}')
-print(f'Unique email count: {str(len(uniqueEmails))}')
+print(f'Unique signed email count: {str(len(uniqueEmails))}')
