@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 import requests
 import json
 import time
@@ -33,11 +34,13 @@ firstPage = getApiData()
 signatureCount = firstPage["list_info"]["num_results"]
 pageCount = firstPage["list_info"]["num_pages"]
 
+# first value of argv is the name of the script being executed
+maxPage = int(sys.argv[1]) if len(sys.argv) > 1 else pageCount
+
 signers = []
 currentPage = 1
-while currentPage < 5: # for testing with only a few API calls
-# while currentPage <= pageCount:
-  print('Current page: ' + str(currentPage))
+while currentPage <= maxPage:
+  print(f'Current page: {str(currentPage)}/{maxPage}')
   pageData = getApiData(currentPage)
   signatures = pageData["signature_requests"]
   for sig in signatures:
@@ -78,6 +81,6 @@ emails = [s.signatureEmail for s in signers]
 uniqueEmails = set(emails)
 
 print('\n')
-print('Signature count: ' + str(signatureCount))
-print('Unique email count: ' + str(len(uniqueEmails)))
-print('Page count: ' + str(pageCount))
+print(f'Total page count: {str(pageCount)}')
+print(f'Total signature count: {str(signatureCount)}')
+print(f'Unique email count: {str(len(uniqueEmails))}')
