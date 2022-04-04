@@ -1,21 +1,33 @@
 #!/usr/bin/python
 
+# HelloSign API docs: https://app.hellosign.com/api/documentation#QuickStart
 import sys
 import requests
 import json
 import time
 from PyPDF4 import PdfFileReader, PdfFileWriter
 
+originalPetitionTemplateId = '6405f93f8e93dc84e9f0f01f21fe11ab91c08cb1' # original "FedEx Letter of Concern"
+followupPetitionTemplateId = '362bfdc78b64fec14f24971050ff88cab46b1b26' # "Fedex Letter of Concern Follow Up"
 apiKey = '18ab7fe66f4a5fcd7a8f06896dbb8c672d781548e44bab1770b182c9924bce59'
 getSignatures = 'https://' + apiKey + ':@api.hellosign.com/v3/signature_request/list'
 getFiles = 'https://' + apiKey + ':@api.hellosign.com/v3/signature_request/files'
 headers = {'authorization': "Basic MThhYjdmZTY2ZjRhNWZjZDdhOGYwNjg5NmRiYjhjNjcyZDc4MTU0OGU0NGJhYjE3NzBiMTgyYzk5MjRiY2U1OTo=", 'accept': "application/json"}
-rootOutoutPath = 'C:\src\personalthings\Lyndsey\HelloSignSignatures\CompletedFiles'
 
-print(f'Using root output path {rootOutoutPath}\n')
+# first value of argv is the name of the script being executed
+isFollowUpPetition = int(sys.argv[1]) == 1
+maxPage = int(sys.argv[2]) if len(sys.argv) > 2 else 0
+singleSignatureId = str(sys.argv[3]) if len(sys.argv) > 3 else None
+
+templateId = originalPetitionTemplateId if isFollowUpPetition == False else followupPetitionTemplateId
+print(f'Is Followup Petition: {str(isFollowUpPetition)}, using templateId: {templateId}')
+
+outputFolder = "LetterOfConcern" if isFollowUpPetition == False else "LetterOfConcernFollowUp"
+rootOutputPath = f'C:\src\personalthings\Lyndsey\HelloSignSignatures\{outputFolder}\CompletedFiles' 
+print(f'Using root output path {rootOutputPath}\n')
 
 def getSignatureData(page = 1):
-  response = requests.get(getSignatures + '?page=' + str(page), headers=headers)
+  response = requests.get(getSignatures + '?page=' + str(page) + '&query=template:' + templateId, headers=headers)
   loaded = json.loads(response.text)
   return loaded
 
@@ -54,19 +66,16 @@ def mergePdfFiles(paths, outputPath):
 firstPage = getSignatureData()
 pageCount = firstPage["list_info"]["num_pages"]
 
+maxPage = maxPage if maxPage > 0 else pageCount
+
 def downloadAndSplitFile(signatureId):
-  rawOutputPath = f'{rootOutoutPath}\Raw\{signatureId}_RAW.pdf'
+  rawOutputPath = f'{rootOutputPath}\Raw\{signatureId}_RAW.pdf'
   print(f'Getting completed file for signatureId {signatureId}')
   getSignatureFile(signatureId, rawOutputPath)
   pageToExtract = 1 # zero-based index, Lyndsey wants the second page with the signature on it
-  splitPagePath = f'{rootOutoutPath}\Split\{signatureId}_Page{str(pageToExtract+1)}.pdf'
+  splitPagePath = f'{rootOutputPath}\Split\{signatureId}_Page{str(pageToExtract+1)}.pdf'
   extractPdfPage(rawOutputPath, pageToExtract, splitPagePath)
   return splitPagePath
-
-# first value of argv is the name of the script being executed
-maxPage = int(sys.argv[1]) if len(sys.argv) > 1 else pageCount
-
-singleSignatureId = str(sys.argv[2]) if len(sys.argv) > 2 else None
 
 currentPage = 1
 retrievedFileCount = 0
@@ -90,7 +99,7 @@ else:
         time.sleep(60)
     currentPage += 1
 
-  mergedFilePath = f'{rootOutoutPath}\AllSignedForms.pdf'
+  mergedFilePath = f'{rootOutputPath}\AllSignedForms.pdf'
   mergePdfFiles(splitFilePaths, mergedFilePath)
 
   print('\n')
