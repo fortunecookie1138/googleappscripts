@@ -77,11 +77,11 @@ def matchEntryFields(fields, entries):
   outputLines = []
   
   headerLine = ','.join(str(x) for x in fields.values())
-  outputLines.append(headerLine + "\n")
+  outputLines.append(headerLine.replace("\r\n", "  ") + "\n")
 
   for entry in sorted(entries, key=lambda x : int(x["EntryId"]), reverse=True):
     entryLine = ','.join(str(x) for x in entry.values())
-    outputLines.append(entryLine + "\n")
+    outputLines.append(entryLine.replace("\r\n", "  ") + "\n")
 
   return outputLines
 
