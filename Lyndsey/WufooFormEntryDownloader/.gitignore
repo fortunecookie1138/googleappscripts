@@ -1,0 +1,4 @@
+# ignore the generated results
+*.csv
+
+my-env/
