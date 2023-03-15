@@ -13,6 +13,12 @@ endpoint = 'https://' + apiKey + ':@api.hellosign.com/v3/signature_request/list'
 headers = {'authorization': "Basic MThhYjdmZTY2ZjRhNWZjZDdhOGYwNjg5NmRiYjhjNjcyZDc4MTU0OGU0NGJhYjE3NzBiMTgyYzk5MjRiY2U1OTo=", 'accept': "application/json"}
 
 # first value of argv is the name of the script being executed
+if len(sys.argv) == 1:
+  print('Get Signature script options:')
+  print('\tFirst arg: Retrieve followup petition stats (0 or 1)')
+  print('\tSecond arg: Max number of pages of signatures to retrieve (number, optional)')
+  sys.exit()
+
 isFollowUpPetition = int(sys.argv[1]) == 1
 maxPage = int(sys.argv[2]) if len(sys.argv) > 2 else 0
 
