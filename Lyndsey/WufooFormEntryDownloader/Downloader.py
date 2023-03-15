@@ -17,6 +17,7 @@ class form:
   hash = ""
   url = ""
 
+formHashToTest = ""
 baseUrl = "https://bbwebforms.wufoo.com/api/v3"
 apiKey = "OUN1-GRDN-7IXP-7ESW"
 printResponses = False
@@ -73,9 +74,6 @@ def retrieveEntries(baseUrl, formHash):
   return parsed["Entries"]
 
 def matchEntryFields(fields, entries):
-  print("Fields:")
-  print(fields)
-
   outputLines = []
   
   headerLine = ','.join(str(x) for x in fields.values())
@@ -87,20 +85,24 @@ def matchEntryFields(fields, entries):
 
   return outputLines
 
-def writeCSV(baseOutputPath, form, records):
+def writeCSV(baseOutputPath, form, lines):
+  print("Writing lines for form hash "+form.hash)
+  print(lines)
   timestamp = time.strftime("%Y%m%d-%H%M%S")
   outputFilename = form.url+"_"+timestamp+".csv"
 
-  f = open(baseOutputPath + "\\" + outputFilename, "w")
-  f.writelines(records)
+  f = open(baseOutputPath + "\\" + outputFilename, "wb")
+  for line in lines:
+    f.write(line.encode())
   f.close()
 
 forms = retrieveForms(baseUrl)
 print("There are "+str(len(forms))+" forms to work through")
 
-for form in forms[0:1]:
+for form in [x for x in forms if formHashToTest == "" or x.hash == formHashToTest]:
   print("Looking at form with hash "+form.hash+" named '"+form.name+"'")
   fields = retrieveFormFields(baseUrl, form.hash)
   entries = retrieveEntries(baseUrl, form.hash)
+  print("This form has "+str(len(entries))+" entries")
   linesToWrite = matchEntryFields(fields, entries)
   writeCSV("C:\src\personalthings\Lyndsey\WufooFormEntryDownloader\Output", form, linesToWrite)
