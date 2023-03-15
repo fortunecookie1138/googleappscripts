@@ -8,7 +8,6 @@
 #
 ##############################
 
-import time
 import requests
 import json
 
@@ -23,6 +22,8 @@ apiKey = "OUN1-GRDN-7IXP-7ESW"
 printResponses = False
 
 def callWufooApi(fullUrl):
+  print("Calling endpoint: " + fullUrl)
+    
   response = requests.get(fullUrl, auth=(apiKey, "doesnotmatter"))
   if response.status_code != 200:
     print("Uh oh! Got back an HTTP "+str(response.status_code)+" reponse when calling '"+fullUrl+"'")
@@ -31,11 +32,10 @@ def callWufooApi(fullUrl):
       print("Response from '"+fullUrl+"'")
       print(response.text)
 
-  return response
+  return json.loads(response.text)
 
 def retrieveForms(baseUrl):
-  response = callWufooApi(baseUrl+"/forms.json")
-  parsed = json.loads(response.text)
+  parsed = callWufooApi(baseUrl+"/forms.json")
 
   forms = []
   for x in parsed["Forms"]:
@@ -48,10 +48,8 @@ def retrieveForms(baseUrl):
   return forms
 
 def retrieveFormFields(baseUrl, formHash):
-  response = callWufooApi(baseUrl+"/forms/"+formHash+"/fields.json?system=true")
-  parsed = json.loads(response.text)
+  parsed = callWufooApi(baseUrl+"/forms/"+formHash+"/fields.json?system=true")
 
-  # fieldsDictionary = { field["ID"]: field["Title"] for field in parsed["Fields"]}
   fieldsDictionary = {}
   for field in parsed["Fields"]:
     fieldID = field["ID"]
@@ -68,19 +66,34 @@ def retrieveFormFields(baseUrl, formHash):
   return fieldsDictionary
 
 def retrieveEntries(baseUrl, formHash):
-  response = callWufooApi(baseUrl+"/forms/"+formHash+"/entries.json?system=true")
-  parsed = json.loads(response.text)
+  allEntries = []
+  gotEntries = True
+  entryStartIndex = 0
+  pageSize = 100
+  while gotEntries == True:
+    parsed = callWufooApi(baseUrl+"/forms/"+formHash+"/entries.json?system=true&pageStart="+str(entryStartIndex)+"&pageSize="+str(pageSize))
+    entries = parsed["Entries"]
+    print(entries)
+    if (len(entries) == 0):
+      gotEntries = False
+    else:
+      allEntries = allEntries + entries
+      entryStartIndex += pageSize
 
-  return parsed["Entries"]
+  return allEntries
+
+def escapeQuotes(value):
+  replaced = value.replace("\"", "\"\"")
+  return replaced
 
 def matchEntryFields(fields, entries):
   outputLines = []
   
-  headerLine = ','.join(str(x) for x in fields.values())
+  headerLine = "\"" + '","'.join(escapeQuotes(str(x)) for x in fields.values()) + "\""
   outputLines.append(headerLine.replace("\r\n", "  ") + "\n")
 
   for entry in sorted(entries, key=lambda x : int(x["EntryId"]), reverse=True):
-    entryLine = ','.join(str(x) for x in entry.values())
+    entryLine = "\"" + '","'.join(escapeQuotes(str(x)) for x in entry.values()) + "\""
     outputLines.append(entryLine.replace("\r\n", "  ") + "\n")
 
   return outputLines
@@ -88,8 +101,7 @@ def matchEntryFields(fields, entries):
 def writeCSV(baseOutputPath, form, lines):
   print("Writing lines for form hash "+form.hash)
   print(lines)
-  timestamp = time.strftime("%Y%m%d-%H%M%S")
-  outputFilename = form.url+"_"+timestamp+".csv"
+  outputFilename = form.url+".csv"
 
   f = open(baseOutputPath + "\\" + outputFilename, "wb")
   for line in lines:
