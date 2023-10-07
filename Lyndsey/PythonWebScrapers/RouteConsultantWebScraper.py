@@ -3,7 +3,7 @@
 ###############################
 # 
 # Ultimately this implementation didn't work because the site only returns the first 30 locations when you retrieve the data this way.
-# I switched to seleneium so I could load the entire page and then retrieve ALL data that way.
+# I switched to selenium so I could load the entire page and then retrieve ALL data that way.
 #
 ##############################
 
