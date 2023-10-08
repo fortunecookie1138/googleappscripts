@@ -17,6 +17,9 @@ IsDebugMode = False
 LoadAllPrograms = True
 # LoadAllPrograms = False
 
+SingleProgramUrl = ""
+# SingleProgramUrl = "https://arts-inspiredlearning.org/programs/hip-hop-rhyming-essays/"
+
 rootUrl = "https://arts-inspiredlearning.org/programs/"
 scrapedResultsFilename = "ArtsInspiredLearningScraped.xlsx"
 logFilePath = "C:\src\personalthings\Lyndsey\PythonWebScrapers\LogFile.log"
@@ -34,9 +37,7 @@ class programDetails:
     tags = "" # called program details in the website, Lyndsey wants them as a comma-separated list
 
     def prettyPrint(self):
-        text = f"Name: {self.name}\nRoute Path: {self.routePath}\nRaw Description: {self.rawDescription}\nFormatted Description: {self.formattedDescription}\nArtists: {self.artists}\nTags: {self.tags}"
-        print(text)
-        return text
+        return f"Name: {self.name}\nRoute Path: {self.routePath}\nRaw Description: {self.rawDescription}\nFormatted Description: {self.formattedDescription}\nArtists: {self.artists}\nTags: {self.tags}"
 
 def Log(asDebug, message):
     messagePlusNewline = str(message)+"\n"
@@ -50,6 +51,9 @@ def Log(asDebug, message):
         f = open(logFilePath, "ab")
         f.write(messagePlusNewline.encode("UTF-8"))
         f.close()
+
+def dedupeList(items):
+    return list( dict.fromkeys(items) )
 
 def collectLinksToPrograms(browser):
     containerElement = browser.find_element(By.CLASS_NAME, "bbq-content")
@@ -94,7 +98,7 @@ def getDataForProgram(browser, linkToProgram):
         programArtistElements = programArtistsContainerElement.find_elements(By.TAG_NAME, "a")
         for e in programArtistElements:
             artists.append(e.text)
-        artists = list( dict.fromkeys(artists) ) # dedupe artists
+        artists = dedupeList(artists)
     Log(True, artists)
 
     programDetailsContainerElement = secondarySectionElement.find_element(By.CLASS_NAME, "sidebar-program-details")
@@ -109,9 +113,10 @@ def getDataForProgram(browser, linkToProgram):
             badHeaderElementText = badHeaderElements[0].text
             Log(True, f"badHeaderText: {badHeaderElementText}")
             tagText = tagText.replace(badHeaderElementText, "")
-        tags.append(tagText.strip())
+        tags.extend(tagText.strip().split("\n")) # because the last section is a li within a li so it ends up being duplicated, once with newlines and once as individual tags. Splitting on newline lets my dedupe logic work better
     while("" in tags):
         tags.remove("")
+    tags = dedupeList(tags)
     Log(True, tags)
     AllProgramTags.extend(tags)
 
@@ -122,7 +127,6 @@ def getDataForProgram(browser, linkToProgram):
     program.formattedDescription = formattedDescription
     program.artists = artists
     program.tags = ", ".join(tags)
-    program.prettyPrint()
     print("\n")
     Log(False, program.prettyPrint())
 
@@ -161,7 +165,6 @@ def writeHeadersToWorkbook(sheet):
     sheet["AD1"] = "Height"
     sheet["AE1"] = "Visible"
     sheet["AF1"] = "Hosted Image URLs"
-    # sheet["AG1"] = "The whole thing"
     
 def writeProgramToWorkbook(sheet, index, program):
     sheet["A"+str(index)] = ""
@@ -196,20 +199,19 @@ def writeProgramToWorkbook(sheet, index, program):
     sheet["AD"+str(index)] = "0"
     sheet["AE"+str(index)] = "Yes"
     sheet["AF"+str(index)] = ""
-    # sheet["AG"+str(index)] = program.prettyPrint()
     index +=1
 
     return index
 
-Log(False, "Start time: " + datetime.datetime.now())
+Log(False, "Start time: " + str(datetime.datetime.now()))
 
 browser = webdriver.Chrome()
 browser.get(rootUrl)
 
-if LoadAllPrograms:
+if LoadAllPrograms and len(SingleProgramUrl) == 0:
     loadMore(browser, 0)
 
-allProgramLinks = collectLinksToPrograms(browser)
+allProgramLinks = [SingleProgramUrl] if len(SingleProgramUrl) > 0 else collectLinksToPrograms(browser)
 Log(False, allProgramLinks)
 
 workbook = Workbook()
@@ -226,7 +228,7 @@ workbook.save(filename=scrapedResultsFilename)
 
 browser.quit()
 
-AllProgramTags = list( dict.fromkeys(AllProgramTags) ) # dedupe
+AllProgramTags = dedupeList(AllProgramTags)
 print(AllProgramTags)
 
-LOg(False, "End time: " + datetime.datetime.now())
+Log(False, "End time: " + str(datetime.datetime.now()))
