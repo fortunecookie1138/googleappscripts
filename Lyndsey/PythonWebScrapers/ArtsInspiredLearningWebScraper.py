@@ -6,8 +6,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+import datetime
 from openpyxl import Workbook
 import re
+import os
 
 # IsDebugMode = True
 IsDebugMode = False
@@ -15,21 +17,39 @@ IsDebugMode = False
 LoadAllPrograms = True
 # LoadAllPrograms = False
 
+rootUrl = "https://arts-inspiredlearning.org/programs/"
+scrapedResultsFilename = "ArtsInspiredLearningScraped.xlsx"
+logFilePath = "C:\src\personalthings\Lyndsey\PythonWebScrapers\LogFile.log"
+AllProgramTags = []
+
+if os.path.exists(logFilePath):
+  os.remove(logFilePath)
+
 class programDetails:
     routePath = ""
     name = ""
-    description = ""
+    rawDescription = ""
+    formattedDescription = ""
     artists = []
     tags = "" # called program details in the website, Lyndsey wants them as a comma-separated list
 
     def prettyPrint(self):
-        print(f"Name: {self.name}\nRoute Path: {self.routePath}\nDescription: {self.description}\nArtists: {self.artists}\nTags: {self.tags}")
+        text = f"Name: {self.name}\nRoute Path: {self.routePath}\nRaw Description: {self.rawDescription}\nFormatted Description: {self.formattedDescription}\nArtists: {self.artists}\nTags: {self.tags}"
+        print(text)
+        return text
 
 def Log(asDebug, message):
+    messagePlusNewline = str(message)+"\n"
     if not asDebug:
         print(message)
+        f = open(logFilePath, "ab")
+        f.write(messagePlusNewline.encode("UTF-8"))
+        f.close()
     if asDebug and IsDebugMode:
         print(message)
+        f = open(logFilePath, "ab")
+        f.write(messagePlusNewline.encode("UTF-8"))
+        f.close()
 
 def collectLinksToPrograms(browser):
     containerElement = browser.find_element(By.CLASS_NAME, "bbq-content")
@@ -47,30 +67,34 @@ def loadMore(browser, previousLinkCount):
     loadMoreDiv = browser.find_element(By.CLASS_NAME, "fl-builder-pagination-load-more")
     loadMoreButton = loadMoreDiv.find_element(By.TAG_NAME, "a")
     if loadMoreButton is not None:
-        Log(True, "I'm gonna click the Load More button")
         loadMoreButton.click()
         time.sleep(2)
         linkCount = len(collectLinksToPrograms(browser))
         if linkCount != previousLinkCount:
             Log(True, f"We had {previousLinkCount}, now we have {linkCount}")
             loadMore(browser, linkCount)
-
+    
 def getDataForProgram(browser, linkToProgram):
     browser.get(linkToProgram)
     primarySectionElement = browser.find_element(By.ID, "primary")
     programName = primarySectionElement.find_element(By.TAG_NAME, "h1").text
     Log(True, programName)
+
     descriptionElement = primarySectionElement.find_element(By.CLASS_NAME, "entry-content")
-    programDescription = descriptionElement.text
-    Log(True, programDescription)
+    rawDescription = descriptionElement.text
+    Log(True, rawDescription)
+    formattedDescription = descriptionElement.get_attribute('innerHTML')
+    Log(True, formattedDescription)
 
     secondarySectionElement = browser.find_element(By.ID, "secondary")
-    programArtistsContainerElement = secondarySectionElement.find_element(By.CLASS_NAME, "sidebar-program-artists")
-    programArtistElements = programArtistsContainerElement.find_elements(By.TAG_NAME, "a")
+    programArtistsContainerElements = secondarySectionElement.find_elements(By.CLASS_NAME, "sidebar-program-artists")
     artists = []
-    for e in programArtistElements:
-        artists.append(e.text)
-    artists = list( dict.fromkeys(artists) ) # de-dupe artists
+    if len(programArtistsContainerElements) > 0:
+        programArtistsContainerElement = programArtistsContainerElements[0]
+        programArtistElements = programArtistsContainerElement.find_elements(By.TAG_NAME, "a")
+        for e in programArtistElements:
+            artists.append(e.text)
+        artists = list( dict.fromkeys(artists) ) # dedupe artists
     Log(True, artists)
 
     programDetailsContainerElement = secondarySectionElement.find_element(By.CLASS_NAME, "sidebar-program-details")
@@ -89,15 +113,18 @@ def getDataForProgram(browser, linkToProgram):
     while("" in tags):
         tags.remove("")
     Log(True, tags)
+    AllProgramTags.extend(tags)
 
     program = programDetails()
     program.routePath = linkToProgram.replace(rootUrl, "").rstrip("/")
     program.name = programName
-    program.description = programDescription
+    program.rawDescription = rawDescription
+    program.formattedDescription = formattedDescription
     program.artists = artists
     program.tags = ", ".join(tags)
     program.prettyPrint()
     print("\n")
+    Log(False, program.prettyPrint())
 
     return program
 
@@ -134,6 +161,7 @@ def writeHeadersToWorkbook(sheet):
     sheet["AD1"] = "Height"
     sheet["AE1"] = "Visible"
     sheet["AF1"] = "Hosted Image URLs"
+    # sheet["AG1"] = "The whole thing"
     
 def writeProgramToWorkbook(sheet, index, program):
     sheet["A"+str(index)] = ""
@@ -142,7 +170,7 @@ def writeProgramToWorkbook(sheet, index, program):
     sheet["D"+str(index)] = "arts-programs"
     sheet["E"+str(index)] = program.routePath
     sheet["F"+str(index)] = program.name
-    sheet["G"+str(index)] = program.description
+    sheet["G"+str(index)] = program.formattedDescription
     sheet["H"+str(index)] = "SQ4218371"
     sheet["I"+str(index)] = ""
     sheet["J"+str(index)] = ""
@@ -168,11 +196,13 @@ def writeProgramToWorkbook(sheet, index, program):
     sheet["AD"+str(index)] = "0"
     sheet["AE"+str(index)] = "Yes"
     sheet["AF"+str(index)] = ""
+    # sheet["AG"+str(index)] = program.prettyPrint()
     index +=1
 
     return index
 
-rootUrl = "https://arts-inspiredlearning.org/programs/"
+Log(False, "Start time: " + datetime.datetime.now())
+
 browser = webdriver.Chrome()
 browser.get(rootUrl)
 
@@ -188,9 +218,15 @@ writeHeadersToWorkbook(sheet)
 
 index = 2
 for link in allProgramLinks:
+    Log(False, f'{str(index-1)}/{str(len(allProgramLinks))}')
     program = getDataForProgram(browser, link)
     index = writeProgramToWorkbook(sheet, index, program)
 
-workbook.save(filename="ArtsInspiredLearningScraped.xlsx")
+workbook.save(filename=scrapedResultsFilename)
 
 browser.quit()
+
+AllProgramTags = list( dict.fromkeys(AllProgramTags) ) # dedupe
+print(AllProgramTags)
+
+LOg(False, "End time: " + datetime.datetime.now())

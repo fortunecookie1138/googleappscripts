@@ -1,4 +1,5 @@
-# ignore the generated scrape results
+# ignore the generated scrape results and log files
 *.xlsx
+*.log
 
 web-scraper-env/
