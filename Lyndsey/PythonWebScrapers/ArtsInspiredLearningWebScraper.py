@@ -11,16 +11,19 @@ from openpyxl import Workbook
 import re
 import os
 
-# IsDebugMode = True
-IsDebugMode = False
+IsDebugMode = True
+# IsDebugMode = False
 
-LoadAllPrograms = True
-# LoadAllPrograms = False
+# LoadAllPrograms = True
+LoadAllPrograms = False
 
 SingleProgramUrl = ""
 # SingleProgramUrl = "https://arts-inspiredlearning.org/programs/hip-hop-rhyming-essays/"
 
-rootUrl = "https://arts-inspiredlearning.org/programs/"
+# rootUrl = "https://arts-inspiredlearning.org/programs/"
+rootUrl = "https://arts-inspiredlearning.org/virtual-programming/" # no need to load more, different home page (but same "program" pages)
+
+proramRootUrl = "https://arts-inspiredlearning.org/programs"
 scrapedResultsFilename = "ArtsInspiredLearningScraped.xlsx"
 logFilePath = "C:\src\personalthings\Lyndsey\PythonWebScrapers\LogFile.log"
 AllProgramTags = []
@@ -56,15 +59,26 @@ def dedupeList(items):
     return list( dict.fromkeys(items) )
 
 def collectLinksToPrograms(browser):
-    containerElement = browser.find_element(By.CLASS_NAME, "bbq-content")
+    parentElements = browser.find_elements(By.CLASS_NAME, "bbq-content")
+    if len(parentElements) > 0:
+        containerElement = parentElements[0]
+    else:
+        parentElements = browser.find_elements(By.CLASS_NAME, "entry-content")
+        print(f'{len(parentElements)} parent elements')
+        if len(parentElements) > 0:
+            containerElement = parentElements[0]
+        else:
+            Log(False, "Couldn't find parent element to acquire program links!")
+            return []
+    
     elements = containerElement.find_elements(By.TAG_NAME, "a")
     Log(True, f"We have {len(elements)} 'a' elements to work with")
     links = []
     for e in elements:
         href = e.get_attribute('href')
-        if href is not None:
+        if href is not None and proramRootUrl in href.lower():
             links.append(href)
-    Log(True, f"We have {len(links)} links to work with")
+    Log(True, f"We have {len(links)} program links to work with")
     return links
 
 def loadMore(browser, previousLinkCount):
@@ -83,6 +97,9 @@ def getDataForProgram(browser, linkToProgram):
     primarySectionElement = browser.find_element(By.ID, "primary")
     programName = primarySectionElement.find_element(By.TAG_NAME, "h1").text
     Log(True, programName)
+    if programName.lower() == "not found":
+        Log(False, f"This appears to be a 'Not Found' page, gonna skip it - {linkToProgram}")
+        return None
 
     descriptionElement = primarySectionElement.find_element(By.CLASS_NAME, "entry-content")
     rawDescription = descriptionElement.text
@@ -199,9 +216,6 @@ def writeProgramToWorkbook(sheet, index, program):
     sheet["AD"+str(index)] = "0"
     sheet["AE"+str(index)] = "Yes"
     sheet["AF"+str(index)] = ""
-    index +=1
-
-    return index
 
 Log(False, "Start time: " + str(datetime.datetime.now()))
 
@@ -218,11 +232,15 @@ workbook = Workbook()
 sheet = workbook.active
 writeHeadersToWorkbook(sheet)
 
-index = 2
+programIndex = 1
+workbookIndex = 2
 for link in allProgramLinks:
-    Log(False, f'{str(index-1)}/{str(len(allProgramLinks))}')
+    Log(False, f'{str(programIndex)}/{str(len(allProgramLinks))}')
     program = getDataForProgram(browser, link)
-    index = writeProgramToWorkbook(sheet, index, program)
+    if program is not None:
+        writeProgramToWorkbook(sheet, workbookIndex, program)
+        workbookIndex += 1
+    programIndex += 1
 
 workbook.save(filename=scrapedResultsFilename)
 
